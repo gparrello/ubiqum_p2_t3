@@ -6,9 +6,25 @@ library("corrplot")
 existingProducts <- read.csv("./data/existingproductattributes2017.csv")
 newProducts <- read.csv("./data/newproductattributes2017.csv")
 
-dataSet <- existingProducts[,!names(existingProducts) %in% c("BestSellersRank")]
-tempSet <- dummyVars(" ~ .", data = dataSet)
-dataSet <- data.frame(predict(tempSet, newdata = existingProducts))
+dataSet <- existingProducts[,!names(existingProducts) %in% c("BestSellersRank", "x5StarReviews")]
+dataSet <- data.frame(
+  predict(
+    tempSet <- dummyVars(" ~ .", data = dataSet),
+    newdata = existingProducts
+  )
+)
 
-corrMatrix <- cor(dataSet)
-corrplot(corrMatrix)
+corrplot(
+  cor(dataSet),
+  method="color",
+  type="upper"
+)
+
+# eliminate outliers
+# fill up NA
+# eliminate duplicate extended warranties
+# normalize variables
+
+corrplot(
+  
+)
