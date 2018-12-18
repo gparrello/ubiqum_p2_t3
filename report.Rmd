@@ -31,7 +31,7 @@ After our analysis we conclude that Product Type is not a good predictor of Sale
 
 We can also say that there is not enough data to asses the impact of customer and service reviews for each product category independently, but we can assert their importance in overall.
 
-Finally, we have included a csv file named *new.csv* with the predicted Sales Volume and Total Profit using our best model.
+Finally, we have included a file named *new.csv* with the predicted Sales Volume and Total Profit using our best model.
 
 ### Recommendations
 Since we do not posses enough data to asses significance of variables for each product category, we recommend regrouping the data by a different categorization which creates bigger but still realistic groups.
@@ -90,44 +90,3 @@ p$height <- params$plot_height * 1.5
 p$width <- params$plot_width
 p
 ```
-
-<!--
-Executive Summary
-
-Goal
-
-Este informe contiene dos objetivos principales:
-Predecir las ventas de PC, Laptops, Netbooks y Smartphones.
-Investigar el impacto que tiene categoría de producto en nuestras ventas.
-
-Highlights
-
-La base de datos de ventas histórica no es lo suficientemente grande como para encontrar patrones y poder predecir con gran confianza.
-Si creemos en los resultados podemos concluir que los modelos utilizados predicen muy bien las cantidades bajas de volumen, en contra no existe un modelo que nos prediga eficientemente las cantidades elevadas de volumen.
-Las predicciones de nuestras cuatro categorías no son altas, con lo que podemos concluir que las predicciones son bastante acertadas.
-
-Recomendaciones
-
-Ampliar y recolectar más datos de nuestras operaciones con el fin de poder realizar análisis más avanzados y más precisos.
-Agrupar los tipo de producto en categorías de producto con el objetivo de visualizar el impacto de estas en Positive Service y Customer Reviews.
-
-Analysis
-
-Nuestro análisis para predecir el volumen de ventas de nuevos productos dónde no tenemos datos, está basado en la idea que los productos actuales comparten atributos con los potenciales nuevos productos.
-
-Las cuatro categorías de producto con mayor potencial de venta son las siguientes, véase lista completa en Anexo.
-
-Methodology
-
-Nuestro análisis para encontrar los mejores predictores para predecir volumen nos ha llevado a escoger las siguientes variables para nuestro análisis: “Positive Service” y “4 star Reviews” para modelar hemos utilizado los siguientes algoritmos de regresión con las siguientes métricas:
-
-KNN
-GBT
-SVM
-RForest
-
-Después de optimizar los modelos con el fin de encontrar las mejores métricas y una performance que se adecuara a lo que buscamos hemos decidido utilizar el KNN, el cual ha sido el que mejor resultados nos ha reportado.
-
-Insertar Métricas y Gráfico de error.
-Message Input
--->
