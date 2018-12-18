@@ -16,48 +16,67 @@ knitr::opts_chunk$set(
   echo = FALSE,
   cache = FALSE
   )
-# knitr::read_chunk('./output.R')
 source("./code.R")
 ```
 
-# Executive Summary
-## What is this report about?
+## Executive Summary
+### What is this report about?
 Our purpose is to predict profitability for a list of new products based on the performance and characteristics of current products, including in our prediction the product category for each one to asses the impact of specific attributes, customer and service reviews, for certain product types.
 
-## Preamble
+### Preamble
 From previous analysis, we know that 4 Star Reviews, 2 Star Reviews and Positive Service Reviews are the best predictors of Sales Volume. In this review, we have added Product Type as a possible predictor of Sales Volume.
 
-## Conclusions
+### Conclusions
 After our analysis we conclude that Product Type is not a good predictor of Sales Volume, although that a product pertains to the type 'Game Console' is significant.
 
-We can also say that there is not enough data to asses the impact of customer and service reviews for each product category independently, but we can assert their importance in overall. 
+We can also say that there is not enough data to asses the impact of customer and service reviews for each product category independently, but we can assert their importance in overall.
 
-## Recommendations
+Finally, we have included a csv file named *new.csv* with the predicted Sales Volume and Total Profit using our best model.
+
+### Recommendations
 Since we do not posses enough data to asses significance of variables for each product category, we recommend regrouping the data by a different categorization which creates bigger but still realistic groups.
 
-# Technical Analysis
+## Technical Analysis
 ```{r results='asis', eval=FALSE}
 dfSummary(existingProducts_orig, plain.ascii = FALSE, style = "grid")
 ```
 
-## Preprocessing
-Outlier elimination
-Feature selection
-Normalization of numerical variables, with exception of the target attribute
+### Preprocessing
+In order to perform modeling over our dataset, we have applied the following transformations:
 
-## Modeling
-In order to assert the importance of variables in respect to Sales Volume, we have run a `r trainedModels[["lm"]]$modelInfo$label` model, where we can see
+* Outlier elimination: we have excluded two observations that present Volume over 7000
+* Normalization of numerical variables, with exception of the target attribute, using z-transformation
+* Feauture selection
+
+#### Feature Selection
+In order to assert the importance of variables in respect to Sales Volume and select the most significant, we have run a `r trainedModels[["lm"]]$modelInfo$label` model:
 ```{r}
 summary(trainedModels[["lm"]])
 ```
+From this we reassert our previous conclusion about the significance of 4 Star Reviews and Positive Service Reviews. Nonetheless we find that 2 Star Reviews becomes not significant when introducing Product Type (as dummies), whereas pertaining to category 'Game Console' is now significant.
 
-### Performance Metrics
+### Modeling
+To predict Sales Volume, we have trained the following models:
+```{r echo=FALSE, results='asis'}
+for(m in trainedModels){
+  cat('\n')
+  cat('* ')
+  cat(m$modelInfo$label, '\n')
+}
+```
+
+For performance metrics we have used repeated cross validation of `r cvRepeatNum` repeats over `r cvFoldNum` folds. For optimization we have used a tune lenght of `r tuneLength`.
+
+#### Performance Metrics
+Using our performance metrics, we have determined our best model to be `r trainedModels[["rf"]]$modelInfo$label`, as we can see below. Columns marked with * refer to the performance of our models over our testing set; without, over the training set.
 ```{r}
 knitr::kable(
   metricsSet[order(-metricsSet$Rsquared),]
 )
 ```
 
+#### Normalized Error Plots
+Below we can see normalized (z-transformed) prediction error over volume for all our models. In orange, observations pertaining to our training set; in blue, to our testing set.
 ```{r eval=TRUE}
 p <- p_grid
 p$height <- params$plot_height * 1.6

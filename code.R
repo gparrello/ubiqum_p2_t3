@@ -36,7 +36,7 @@ plotDistributions <- function(dataSet){
 }
 
 
-selectAttributes <- function(dataSet){
+selectAttributes <- function(dataSet, excludedAttr){
   
   # Subset given dataset based on a list of attributes
   
@@ -82,6 +82,13 @@ normalizeThis <- function(dataSet){
 }
 
 
+dummyfyThis <- function(dataSet){
+  dumm <- dummyVars(" ~ .", data = dataSet)
+  pred <- predict(dumm, newdata = dataSet)
+  df <- data.frame(pred)
+  return(df)
+}
+
 #### Load Data ####
 # set working directory first!!!
 existingProducts_orig <- read.csv("./data/existingproductattributes2017.csv")
@@ -89,7 +96,7 @@ newProducts <- read.csv("./data/newproductattributes2017.csv")
 
 
 #### Preprocess ####
-# remove NA
+# replace NA in BestSellersRank with the mean of the existing values
 existingProducts <- existingProducts_orig
 existingProducts[is.na(existingProducts[,"BestSellersRank"]), "BestSellersRank"] <- mean(
     existingProducts[,"BestSellersRank"],
@@ -97,8 +104,8 @@ existingProducts[is.na(existingProducts[,"BestSellersRank"]), "BestSellersRank"]
 )
 
 # select attributes
-dataSet <- selectAttributes(existingProducts)
-newSet <- selectAttributes(newProducts)
+dataSet <- selectAttributes(existingProducts, excludedAttr)
+newSet <- selectAttributes(newProducts, excludedAttr)
 
 # eliminate outliers
 dataSet <- subset(
@@ -111,12 +118,8 @@ dataSet <- normalizeThis(dataSet)
 newSet <- normalizeThis(newSet)
 
 # build dummies
-dataSet <- data.frame(
-  predict(
-    dummyVars(" ~ .", data = dataSet),
-    newdata = dataSet
-  )
-)
+dataSet <- dummyfyThis(dataSet)
+newSet <- dummyfyThis(newSet)
 
 plotCorr <- corrplot(
   cor(dataSet),
@@ -135,10 +138,12 @@ trainingSet <- dataSet[inTraining,]
 testingSet <- dataSet[-inTraining,]
 
 #### Train Control ####
+cvFoldNum <- 10
+cvRepeatNum <- 5
 cvFolds <- createMultiFolds(
   trainingSet$Volume,
-  k = 10,
-  times = 5
+  k = cvFoldNum,
+  times = cvRepeatNum
 )
 
 fitControl <- trainControl(
@@ -199,9 +204,9 @@ for(model in models){
     ),
     2
   )
+  trainingSet_output$Model <- model
   # set training set label
-  trainingSet_output$model <- model
-  trainingSet_output$partition <- "training"
+  trainingSet_output$Partition <- "training"
   
   testingSet_output <- testingSet
   # predict for testing set
@@ -219,9 +224,9 @@ for(model in models){
     ),
     2
   )
-  testingSet_output$model <- model
+  testingSet_output$Model <- model
   # set testing set label
-  testingSet_output$partition <- "testing"
+  testingSet_output$Partition <- "testing"
   
   # union sets and save in list and file
   rebindSet <- rbind(trainingSet_output, testingSet_output)
@@ -237,8 +242,8 @@ for(model in models){
       Volume,
       Error,
       data = rebindSet,
-      color = partition,
-      hover = c(partition, Volume, Prediction, Error)
+      color = Partition,
+      hover = c(Partition, Volume, Prediction, Error)
     ) %>%
     ly_abline(
       a = 0,
@@ -255,15 +260,17 @@ outputSet <- Reduce(
 )
 # write output set to file
 write.csv(outputSet, file="./output/output.csv")
+
+# create error comparing plot
 p_full <- figure(
   legend_location = "bottom_left"
 ) %>%
   ly_points(
     Volume,
     Error,
-    data = outputSet,
-    glyph = partition,
-    color = model
+    data = subset(outputSet, Model %in% c("gbm", "rf")),
+    # glyph = Partition,
+    color = Model
   )
 
 # draw grid with error plot for each model
@@ -321,3 +328,30 @@ for (model in models){
     )
   }
 }
+
+
+# calculate new product predictions
+newSet$Volume <- round(
+  predict(
+    trainedModels[["rf"]],
+    newSet
+  ),
+  2
+)
+newSet <- newSet[, -grep("ProductType.", colnames(newSet))]
+newSet <- cbind(
+  subset(
+    newSet,
+    select = Volume
+  ),
+  subset(
+    newProducts,
+    select = c(
+      ProfitMargin,
+      Price,
+      ProductNum
+    )
+  )
+)
+newSet$TotalProfit <- round(newSet$Price * newSet$ProfitMargin * newSet$Volume, 2)
+write.csv(newSet, file="./output/new.csv")
