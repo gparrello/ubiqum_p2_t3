@@ -1,0 +1,114 @@
+---
+title: "Report"
+author: "Raul Vazquez, Gerardo Parrello"
+date: "December 14, 2018"
+output:
+  html_document: default
+  pdf_document: default
+geometry: "left=1cm,right=1cm,top=2cm,bottom=2cm"
+params:
+  plot_height: 549
+  plot_width: 888
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  cache = FALSE
+  )
+# knitr::read_chunk('./output.R')
+source("./code.R")
+```
+
+# Executive Summary
+## What is this report about?
+Our purpose is to predict profitability for a list of new products based on the performance and characteristics of current products, including in our prediction the product category for each one to asses the impact of specific attributes, customer and service reviews, for certain product types.
+
+## Preamble
+From previous analysis, we know that 4 Star Reviews, 2 Star Reviews and Positive Service Reviews are the best predictors of Sales Volume. In this review, we have added Product Type as a possible predictor of Sales Volume.
+
+## Conclusions
+After our analysis we conclude that Product Type is not a good predictor of Sales Volume, although that a product pertains to the type 'Game Console' is significant.
+
+We can also say that there is not enough data to asses the impact of customer and service reviews for each product category independently, but we can assert their importance in overall. 
+
+## Recommendations
+Since we do not posses enough data to asses significance of variables for each product category, we recommend regrouping the data by a different categorization which creates bigger but still realistic groups.
+
+# Technical Analysis
+```{r results='asis', eval=FALSE}
+dfSummary(existingProducts_orig, plain.ascii = FALSE, style = "grid")
+```
+
+## Preprocessing
+Outlier elimination
+Feature selection
+Normalization of numerical variables, with exception of the target attribute
+
+## Modeling
+In order to assert the importance of variables in respect to Sales Volume, we have run a `r trainedModels[["lm"]]$modelInfo$label` model, where we can see
+```{r}
+summary(trainedModels[["lm"]])
+```
+
+### Performance Metrics
+```{r}
+knitr::kable(
+  metricsSet[order(-metricsSet$Rsquared),]
+)
+```
+
+```{r eval=TRUE}
+p <- p_grid
+p$height <- params$plot_height * 1.6
+p$width <- params$plot_width
+p
+```
+
+```{r eval=FALSE}
+p <- p_scatter_type
+p$height <- params$plot_height * 1.5
+p$width <- params$plot_width
+p
+```
+
+<!--
+Executive Summary
+
+Goal
+
+Este informe contiene dos objetivos principales:
+Predecir las ventas de PC, Laptops, Netbooks y Smartphones.
+Investigar el impacto que tiene categoría de producto en nuestras ventas.
+
+Highlights
+
+La base de datos de ventas histórica no es lo suficientemente grande como para encontrar patrones y poder predecir con gran confianza.
+Si creemos en los resultados podemos concluir que los modelos utilizados predicen muy bien las cantidades bajas de volumen, en contra no existe un modelo que nos prediga eficientemente las cantidades elevadas de volumen.
+Las predicciones de nuestras cuatro categorías no son altas, con lo que podemos concluir que las predicciones son bastante acertadas.
+
+Recomendaciones
+
+Ampliar y recolectar más datos de nuestras operaciones con el fin de poder realizar análisis más avanzados y más precisos.
+Agrupar los tipo de producto en categorías de producto con el objetivo de visualizar el impacto de estas en Positive Service y Customer Reviews.
+
+Analysis
+
+Nuestro análisis para predecir el volumen de ventas de nuevos productos dónde no tenemos datos, está basado en la idea que los productos actuales comparten atributos con los potenciales nuevos productos.
+
+Las cuatro categorías de producto con mayor potencial de venta son las siguientes, véase lista completa en Anexo.
+
+Methodology
+
+Nuestro análisis para encontrar los mejores predictores para predecir volumen nos ha llevado a escoger las siguientes variables para nuestro análisis: “Positive Service” y “4 star Reviews” para modelar hemos utilizado los siguientes algoritmos de regresión con las siguientes métricas:
+
+KNN
+GBT
+SVM
+RForest
+
+Después de optimizar los modelos con el fin de encontrar las mejores métricas y una performance que se adecuara a lo que buscamos hemos decidido utilizar el KNN, el cual ha sido el que mejor resultados nos ha reportado.
+
+Insertar Métricas y Gráfico de error.
+Message Input
+-->
