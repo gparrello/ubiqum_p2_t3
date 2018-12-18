@@ -349,8 +349,18 @@ newSet <- cbind(
     select = c(
       ProfitMargin,
       Price,
-      ProductNum
+      ProductNum,
+      ProductType
     )
+  )
+)
+newSet <- subset(
+  newSet,
+  newSet$ProductType %in% c(
+    "PC",
+    "Laptop",
+    "Netbook",
+    "Smartphone"
   )
 )
 newSet$TotalProfit <- round(newSet$Price * newSet$ProfitMargin * newSet$Volume, 2)
