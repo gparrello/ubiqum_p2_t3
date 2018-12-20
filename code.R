@@ -101,7 +101,8 @@ existingProducts <- existingProducts_orig
 existingProducts[is.na(existingProducts[,"BestSellersRank"]), "BestSellersRank"] <- mean(
     existingProducts[,"BestSellersRank"],
     na.rm = TRUE
-)
+) # do not replace data if it represents more than 5% of the total
+
 
 # select attributes
 dataSet <- selectAttributes(existingProducts, excludedAttr)
@@ -204,6 +205,7 @@ for(model in models){
     ),
     2
   )
+  
   trainingSet_output$Model <- model
   # set training set label
   trainingSet_output$Partition <- "training"
@@ -316,7 +318,7 @@ for (model in models){
   )
   for(metric in metrics){
     metricsSet[label, paste(metric, "", sep="")] = round(
-      tail(
+      tail( # use getTrainPerf instead of tail to get the best results
         trainedModels[[model]]$results,
         1
       )[[metric]],
