@@ -3,8 +3,8 @@ title: "Report"
 author: "Raul Vazquez, Gerardo Parrello"
 date: "December 14, 2018"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 geometry: "left=1cm,right=1cm,top=2cm,bottom=2cm"
 params:
   plot_height: 549

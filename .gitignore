@@ -2,5 +2,5 @@
 *.Rhistory
 *.Rproj
 
-*.html
-*.pdf
+#*.html
+#*.pdf
