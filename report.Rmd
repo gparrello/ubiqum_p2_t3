@@ -3,15 +3,15 @@ title: "Report"
 author: "Raul Vazquez, Gerardo Parrello"
 date: "December 14, 2018"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 geometry: "left=1cm,right=1cm,top=2cm,bottom=2cm"
 params:
   plot_height: 549
   plot_width: 888
 ---
 
-```{r setup, include=FALSE, echo=FALSE}
+```{r setup, include=FALSE, echo=FALSE, warning=FALSE}
 knitr::opts_chunk$set(
   echo = FALSE,
   cache = FALSE
@@ -37,7 +37,7 @@ Finally, we have included a file named *new.csv* with the predicted Sales Volume
 Since we do not posses enough data to asses significance of variables for each product category, we recommend regrouping the data by a different categorization which creates bigger but still realistic groups.
 
 ## Technical Analysis
-```{r results='asis', eval=FALSE}
+```{r results='asis', eval=FALSE, warning=FALSE}
 dfSummary(existingProducts_orig, plain.ascii = FALSE, style = "grid")
 ```
 
@@ -50,14 +50,14 @@ In order to perform modeling over our dataset, we have applied the following tra
 
 #### Feature Selection
 In order to assert the importance of variables in respect to Sales Volume and select the most significant, we have run a `r trainedModels[["lm"]]$modelInfo$label` model:
-```{r}
+```{r, warning=FALSE}
 summary(trainedModels[["lm"]])
 ```
 From this we reassert our previous conclusion about the significance of 4 Star Reviews and Positive Service Reviews. Nonetheless we find that 2 Star Reviews becomes not significant when introducing Product Type (as dummies), whereas pertaining to category 'Game Console' is now significant.
 
 ### Modeling
 To predict Sales Volume, we have trained the following models:
-```{r echo=FALSE, results='asis'}
+```{r echo=FALSE, results='asis', warning=FALSE}
 for(m in trainedModels){
   cat('\n')
   cat('* ')
@@ -69,7 +69,7 @@ For performance metrics we have used repeated cross validation of `r cvRepeatNum
 
 #### Performance Metrics
 Using our performance metrics, we have determined our best model to be `r trainedModels[["rf"]]$modelInfo$label`, as we can see below. Columns marked with * refer to the performance of our models over our testing set; without, over the training set.
-```{r}
+```{r, warning=FALSE}
 knitr::kable(
   metricsSet[order(-metricsSet$Rsquared),]
 )
@@ -77,14 +77,14 @@ knitr::kable(
 
 #### Normalized Error Plots
 Below we can see normalized (z-transformed) prediction error over volume for all our models. In orange, observations pertaining to our training set; in blue, to our testing set.
-```{r eval=TRUE}
+```{r eval=TRUE, warning=FALSE}
 p <- p_grid
 p$height <- params$plot_height * 1.6
 p$width <- params$plot_width
 p
 ```
 
-```{r eval=FALSE}
+```{r eval=FALSE, warning=FALSE}
 p <- p_scatter_type
 p$height <- params$plot_height * 1.5
 p$width <- params$plot_width
